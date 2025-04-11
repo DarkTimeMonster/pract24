@@ -1,0 +1,172 @@
+using System;
+using System.Collections.Generic;
+
+namespace ConsoleApp6
+{
+    // Базовый класс Automat
+    public class Automat
+    {
+        protected string currentState;
+        protected Dictionary<(string, string), string> transitions;
+
+        public Automat()
+        {
+            currentState = "a";
+            transitions = new Dictionary<(string, string), string>
+            {
+                { ("a", "012"), "b" },
+                { ("a", "210"), "b" },
+                { ("b", "012"), "a" },
+                { ("b", "211"), "a" },
+                { ("a", "110"), "a" },
+                { ("b", "111"), "b" }
+            };
+        }
+
+        public void ProcessInput(string input)
+        {
+            if (transitions.TryGetValue((currentState, input), out string nextState))
+            {
+                Console.WriteLine($"Переход: {currentState} -> {nextState} по входу {input}");
+                currentState = nextState;
+            }
+            else
+            {
+                Console.WriteLine($"Нет перехода из состояния {currentState} по входу {input}");
+            }
+        }
+
+        public string GetCurrentState()
+        {
+            return currentState;
+        }
+    }
+
+    // Класс-наследник movAutomat, добавляющий свойство Speed и метод CalculateDistance
+    public class movAutomat : Automat
+    {
+        public double Speed { get; set; } 
+
+        public movAutomat(double speed) : base()
+        {
+            Speed = speed;
+        }
+
+        // Путь = скорость * время
+        public double CalculateDistance(double timeSeconds)
+        {
+            return Speed * timeSeconds;
+        }
+    }
+
+    // Новый класс-потомок для варианта 6. 
+    // Добавляем дополнительные поля: ускорение и направление.
+    public class movAutomat6 : movAutomat
+    {
+        // Дополнительные поля для варианта 6 (табл. 11.5, столб 2)
+        public double Acceleration { get; set; }
+        public string Direction { get; set; }
+
+        // Конструктор: инициализируем поля родительского класса (Speed) и новые поля
+        public movAutomat6(double speed, double acceleration, string direction) : base(speed)
+        {
+            Acceleration = acceleration;
+            Direction = direction;
+        }
+
+        // Функция обработки данных (табл. 11.5, столб 3)
+        // Здесь, например, обновляем скорость с учетом ускорения за заданный промежуток времени.
+        public void ProcessData(double timeSeconds)
+        {
+            // Новая скорость = старая скорость + ускорение * время
+            double oldSpeed = Speed;
+            Speed = Speed + Acceleration * timeSeconds;
+            Console.WriteLine($"Скорость изменена: {oldSpeed} -> {Speed} м/с за {timeSeconds} с (ускорение: {Acceleration} м/с²)");
+        }
+
+        // Функция формирования строки информации об объекте
+        public string GetInfo()
+        {
+            return $"Текущее состояние автомата: {GetCurrentState()}, " +
+                   $"Скорость: {Speed} м/с, " +
+                   $"Ускорение: {Acceleration} м/с², " +
+                   $"Направление: {Direction}";
+        }
+    }
+
+    // Демонстрационный проект
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Демонстрация работы класса-родителя movAutomat
+            Console.Write("Введите скорость для базового автомата (м/с): ");
+            if (!double.TryParse(Console.ReadLine(), out double baseSpeed))
+            {
+                Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
+                return;
+            }
+
+            movAutomat baseAutomat = new movAutomat(baseSpeed);
+
+            Console.Write("Введите входную последовательность для базового автомата (например, 012): ");
+            string inputSequence = Console.ReadLine();
+            baseAutomat.ProcessInput(inputSequence);
+
+            Console.Write("Введите время движения (в секундах): ");
+            if (!double.TryParse(Console.ReadLine(), out double time))
+            {
+                Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
+                return;
+            }
+
+            double distance = baseAutomat.CalculateDistance(time);
+            Console.WriteLine($"Базовый автомат. Скорость: {baseAutomat.Speed} м/с, Время: {time} с, Пройденное расстояние: {distance} м");
+            Console.WriteLine();
+
+            // Демонстрация работы класса-потомка movAutomat6 (вариант 6)
+            Console.Write("Введите скорость для расширенного автомата (м/с): ");
+            if (!double.TryParse(Console.ReadLine(), out double extSpeed))
+            {
+                Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
+                return;
+            }
+
+            Console.Write("Введите ускорение для расширенного автомата (м/с²): ");
+            if (!double.TryParse(Console.ReadLine(), out double acceleration))
+            {
+                Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
+                return;
+            }
+
+            Console.Write("Введите направление движения (например, север, юг и т.д.): ");
+            string direction = Console.ReadLine();
+
+            movAutomat6 extendedAutomat = new movAutomat6(extSpeed, acceleration, direction);
+
+            Console.Write("Введите входную последовательность для расширенного автомата (например, 012): ");
+            string inputSeqExt = Console.ReadLine();
+            extendedAutomat.ProcessInput(inputSeqExt);
+
+            Console.Write("Введите время движения для обработки данных (в секундах): ");
+            if (!double.TryParse(Console.ReadLine(), out double procTime))
+            {
+                Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
+                return;
+            }
+
+            // Обработка данных – обновление скорости с учетом ускорения
+            extendedAutomat.ProcessData(procTime);
+
+            // Вычисление пройденного расстояния уже после обновления скорости
+            double extDistance = extendedAutomat.CalculateDistance(time);
+            Console.WriteLine($"Расширенный автомат. Скорость: {extendedAutomat.Speed} м/с, " +
+                              $"Время: {time} с, Пройденное расстояние: {extDistance} м");
+            Console.WriteLine();
+
+            // Формирование и вывод строки информации об объекте
+            Console.WriteLine("Информация о расширенном автомате:");
+            Console.WriteLine(extendedAutomat.GetInfo());
+        }
+    }
+}
