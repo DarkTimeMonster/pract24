@@ -1,17 +1,27 @@
-﻿namespace ConsoleApp6;
-
-public class movAutomat : Automat
+﻿namespace ConsoleApp6
 {
-    public double Speed { get; set; } 
-
-    public movAutomat(double speed) : base()
+    public class MowAutomat : Automat
     {
-        Speed = speed;
-    }
+        public double SpeedMetersPerSecond { get; private set; }
 
-    //путь = скорость * время
-    public double CalculateDistance(double timeSeconds)
-    {
-        return Speed * timeSeconds;
+        public MowAutomat(double speed)
+        {
+            SpeedMetersPerSecond = speed > 0 ? speed : 1.0;
+        }
+
+        // Метод вычисления расстояния по времени
+        public double CalculateDistance(double timeSeconds)
+        {
+            if (timeSeconds < 0)
+                throw new ArgumentException("Время не может быть отрицательным");
+            
+            return SpeedMetersPerSecond * timeSeconds;
+        }
+
+        public override void DisplayInfo()
+        {
+            base.DisplayInfo();
+            Console.WriteLine($"Скорость объекта: {SpeedMetersPerSecond} м/с");
+        }
     }
 }

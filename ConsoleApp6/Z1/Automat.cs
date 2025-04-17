@@ -1,40 +1,71 @@
-﻿namespace ConsoleApp6;
+﻿using System;
+using System.Collections.Generic;
 
-public class Automat
+namespace ConsoleApp6
 {
-    protected string currentState;
-    
-    protected Dictionary<(string, string), string> transitions;
-
-    public Automat()
+    public class Automat
     {
-        currentState = "a";
-        transitions = new Dictionary<(string, string), string>
-        {
-            { ("a", "012"), "b" },
-            { ("a", "210"), "b" },
-            { ("b", "012"), "a" },
-            { ("b", "211"), "a" },
-            { ("a", "110"), "a" },
-            { ("b", "111"), "b" }
-        };
-    }
+        public enum State { A, B }
+        protected State currentState;
+        protected Dictionary<State, Dictionary<string, State>> transitionTable;
 
-    public void ProcessInput(string input)
-    {
-        if (transitions.TryGetValue((currentState, input), out string nextState))
+        public Automat()
         {
-            Console.WriteLine($"Переход: {currentState} -> {nextState} по входу {input}");
-            currentState = nextState;
+            currentState = State.A;
+
+            transitionTable = new Dictionary<State, Dictionary<string, State>>
+            {
+                { State.A, new Dictionary<string, State>
+                    {
+                        { "110", State.A },
+                        { "012", State.B },
+                        { "210", State.B }
+                    }
+                },
+                { State.B, new Dictionary<string, State>
+                    {
+                        { "111", State.B },
+                        { "012", State.A },
+                        { "211", State.A }
+                    }
+                }
+            };
         }
-        else
-        {
-            Console.WriteLine($"Нет перехода из состояния {currentState} по входу {input}");
-        }
-    }
 
-    public string GetCurrentState()
-    {
-        return currentState;
+        public virtual void ProcessInput(string input)
+        {
+            if (transitionTable.ContainsKey(currentState) &&
+                transitionTable[currentState].ContainsKey(input))
+            {
+                State next = transitionTable[currentState][input];
+                Console.WriteLine($"Переход: {currentState} --({input})--> {next}");
+                currentState = next;
+            }
+            else
+            {
+                Console.WriteLine($"Неверный ввод '{input}' для состояния {currentState}");
+            }
+        }
+
+        public State GetCurrentState() => currentState;
+
+        public virtual void DisplayInfo()
+        {
+            Console.WriteLine($"Текущее состояние: {currentState}");
+            Console.WriteLine("Возможные переходы:");
+            foreach (var from in transitionTable)
+            {
+                foreach (var input in from.Value)
+                {
+                    Console.WriteLine($"  {from.Key} --({input.Key})--> {input.Value}");
+                }
+            }
+        }
+
+        public void Reset()
+        {
+            currentState = State.A;
+            Console.WriteLine("Автомат сброшен в состояние A");
+        }
     }
 }

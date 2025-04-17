@@ -1,5 +1,4 @@
 ﻿using ConsoleApp6;
-using DateTime = ConsoleApp6.DateTime;
 
 public class Program
 {
@@ -53,79 +52,55 @@ public class Program
     
     static void InputInfoZ1()
     {
-        Console.Write("Введите скорость движения объекта (м/с): ");
-        if (!double.TryParse(Console.ReadLine(), out double speed))
+        Console.WriteLine("=== Демонстрация автомата движения объекта ===");
+
+        Console.Write("Введите скорость объекта (м/с): ");
+        double speed = double.TryParse(Console.ReadLine(), out var val) ? val : 1.0;
+
+        var automaton = new MowAutomat(speed);
+        automaton.DisplayInfo();
+
+        // Ввод переходов
+        Console.WriteLine("\nВведите входы (например, 110, 012, 111). Введите 'stop' для завершения:");
+        string input;
+        while ((input = Console.ReadLine()) != "stop")
         {
-            Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
-            return;
+            automaton.ProcessInput(input);
         }
-        
-       movAutomat movingAutomaton = new movAutomat(speed);
-       
-        Console.Write("Введите входную последовательность (например, 012): ");
-        string inputSequence = Console.ReadLine();
-        
-        movingAutomaton.ProcessInput(inputSequence);
-        
-        Console.Write("Введите время движения (в секундах): ");
-        if (!double.TryParse(Console.ReadLine(), out double time))
-        {
-            Console.WriteLine("Ошибка ввода. Пожалуйста, введите числовое значение.");
-            return;
-        }
-        
-        double distance = movingAutomaton.CalculateDistance(time);
-        Console.WriteLine($"Скорость: {movingAutomaton.Speed} м/с, Время: {time} с, Пройденное расстояние: {distance} м");
+
+        // Расчёт расстояния
+        Console.Write("\nВведите время движения (сек): ");
+        double time = double.TryParse(Console.ReadLine(), out var tVal) ? tVal : 0;
+
+        double distance = automaton.CalculateDistance(time);
+        Console.WriteLine($"Объект прошёл расстояние: {distance} м");
+
+        Console.WriteLine("Работа завершена.");
+        Console.ReadKey();
     }
     static void InputInfoZ2()
     {
-        // Ввод данных для класса-родителя
-        Console.WriteLine("Введите дату для класса-родителя:");
-
-        Console.Write("День: ");
-        int d1 = int.Parse(Console.ReadLine());
-
-        Console.Write("Месяц: ");
-        int m1 = int.Parse(Console.ReadLine());
-
-        Console.Write("Год: ");
+        Console.WriteLine("Введите координаты точки A (x1 y1):");
+        int x1 = int.Parse(Console.ReadLine());
         int y1 = int.Parse(Console.ReadLine());
 
-        Date date = new Date(d1, m1, y1);
-        Console.WriteLine("\nКласс-родитель:");
-        Console.WriteLine(date.GetInfo());
-        Console.WriteLine($"Високосный год: {date.IsLeapYear()}");
-        date.AddFiveDays();
-        Console.WriteLine("После добавления 5 дней:");
-        Console.WriteLine(date.GetInfo());
-        Console.WriteLine();
-        
-        Console.WriteLine("Введите дату и время для класса-потомка:");
-
-        Console.Write("День: ");
-        int d2 = int.Parse(Console.ReadLine());
-
-        Console.Write("Месяц: ");
-        int m2 = int.Parse(Console.ReadLine());
-
-        Console.Write("Год: ");
+        Console.WriteLine("Введите координаты точки B (x2 y2):");
+        int x2 = int.Parse(Console.ReadLine());
         int y2 = int.Parse(Console.ReadLine());
 
-        Console.Write("Часы: ");
-        int h = int.Parse(Console.ReadLine());
+        Console.Write("Введите цвет треугольника: ");
+        string color = Console.ReadLine();
 
-        Console.Write("Минуты: ");
-        int min = int.Parse(Console.ReadLine());
+        Console.Write("Введите текущие часы: ");
+        int hour = int.Parse(Console.ReadLine());
 
-        Console.Write("Секунды: ");
-        int sec = int.Parse(Console.ReadLine());
+        Console.Write("Введите текущие минуты: ");
+        int minute = int.Parse(Console.ReadLine());
 
-        DateTime dateTime = new DateTime(d2, m2, y2, h, min, sec);
-        Console.WriteLine("\nКласс-потомок:");
-        Console.WriteLine(dateTime.GetInfo());
-        dateTime.Add100Minutes();
-        Console.WriteLine("После добавления 100 минут:");
-        Console.WriteLine(dateTime.GetInfo());
+        ColoredTrio trio = new ColoredTrio(x1, y1, x2, y2, color, hour, minute);
+
+        Console.WriteLine("\nИнформация об объекте:");
+        Console.WriteLine(trio.GetInfo());
 
         Console.ReadLine();
     }
