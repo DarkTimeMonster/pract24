@@ -12,6 +12,7 @@
         Year = year;
         MinGrade = minGrade;
     }
+    
  
     public virtual void PromoteToNextYear()
     {
@@ -28,8 +29,9 @@
         return 300;
     }
  
-    public string GetInfo()
+    public virtual string GetInfo()
     {
         return $"{FullName}, {Faculty}, Курс: {Year}, Мин. оценка: {MinGrade}, Стипендия: {GetScholarship()} грн";
     }
+
 }
