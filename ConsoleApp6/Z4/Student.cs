@@ -31,7 +31,7 @@
  
     public virtual string GetInfo()
     {
-        return $"{FullName}, {Faculty}, Курс: {Year}, Мин. оценка: {MinGrade}, Стипендия: {GetScholarship()} грн";
+        return $"{FullName}, {Faculty}, Курс: {Year}, Мин. оценка: {MinGrade}, Стипендия: {GetScholarship()} грн.";
     }
 
 }

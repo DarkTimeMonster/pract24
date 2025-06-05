@@ -26,7 +26,7 @@
 
     public override string GetInfo()
     {
-        return base.GetInfo() + $"\n{ItsContract()}, Оплачено: {IsContractPaid}";
+        return base.GetInfo() + $" {ItsContract()}, Оплачено: {IsContractPaid}";
         
     }
 }
